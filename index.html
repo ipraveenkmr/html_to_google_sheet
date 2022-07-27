@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+    <script>
+          var rnum = "";
+
+        function AddRow() {
+            var name = document.getElementById("name").value;
+            var mobile_no = document.getElementById("mobile_no").value;
+            var email_id = document.getElementById("email_id").value;
+
+            if (name != '' && mobile_no != '' && email_id != '') {
+                google.script.run.withSuccessHandler(function (return_string) {
+                    document.getElementById("add_button").disabled = false;
+                }).AddRecord(name, mobile_no, email_id);
+            }
+        }
+
+        function UpdateRecord(row_number) {
+            var record_id = rnum;
+            var name = document.getElementById("name").value;
+            var mobile_no = document.getElementById("mobile_no").value;
+            var email_id = document.getElementById("email_id").value;
+
+            google.script.run.withSuccessHandler(function (return_string) {
+  
+            }).UpdateRecord(record_id, name, mobile_no, email_id);
+        }
+
+        function EditRecord(row_number) {
+
+            var record_id = document.getElementById("up_record_id" + row_number).value;
+            var node_name = document.getElementById("up_name" + row_number);
+            var node_mobile = document.getElementById("up_mobile_no" + row_number);
+            var node_email = document.getElementById("up_email_id" + row_number);
+
+            var name_text = node_name.textContent || node_name.innerText;
+            var mobile_text = node_mobile.textContent || node_mobile.innerText;
+            var email_text = node_email.textContent || node_email.innerText;
+
+            document.getElementById("name").value = name_text;
+            document.getElementById("mobile_no").value = mobile_text;
+            document.getElementById("email_id").value = email_text;
+
+            rnum = record_id;
+
+
+        }
+
+        function DeleteRecord(row_number) {
+
+            var record_id = document.getElementById("up_record_id" + row_number).value;
+
+            google.script.run.withSuccessHandler(function (return_string) {
+                if (return_string == 'SUCCESS') {
+                    document.getElementById("up_record_id" + row_number).remove();
+                    document.getElementById("up_name" + row_number).remove();
+                    document.getElementById("up_mobile_no" + row_number).remove();
+                    document.getElementById("up_email_id" + row_number).remove();
+                    document.getElementById("up_update" + row_number).remove();
+                    document.getElementById("up_update" + row_number).remove();
+                }
+            }).DeleteRecord(record_id);
+        }
+
+
+        function SearchRecords() {
+            var name = document.getElementById("name").value;
+            var mobile_no = document.getElementById("mobile_no").value;
+            var email_id = document.getElementById("email_id").value;
+            var email_id_search = document.getElementById("email_id_search").value;
+            var row_number = 0;
+
+            google.script.run.withSuccessHandler(function (ar) {
+
+                console.log(ar);
+                var displayTable = '<div class=\"grid grid-cols-5 gap-4\">';
+                displayTable += "<div><b>Name</b></b></div>";
+                displayTable += "<div><b>Mobile</b></div>";
+                displayTable += "<div><b>Email</b></div>";
+                displayTable += "<div><b>Update</b></div>";
+                displayTable += "<div><b>Delete</b></div>";
+                displayTable += "</div>";
+                displayTable += "<div class=\"grid grid-cols-5 gap-4\">";
+
+                ar.forEach(function (item, index) {
+                    displayTable += "<input type=\"hidden\" id=\"up_record_id" + row_number + "\" value=\"" + item[0] + "\" />";
+                    displayTable += "<div id=\"up_name" + row_number + "\">";
+                    displayTable += item[1]
+                    displayTable += "</div>"
+                    displayTable += "<div id=\"up_mobile_no" + row_number + "\">";
+                    displayTable += item[2]
+                    displayTable += "</div>"
+                    displayTable += "<div id=\"up_email_id" + row_number + "\">";
+                    displayTable += item[3]
+                    displayTable += "</div>"
+                    displayTable += "<div id=\"up_update" + row_number + "\" onclick=\"EditRecord(" + row_number + ")\" class=\"text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto max-w-[120px] px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800\">";
+                    displayTable += "Edit"
+                    displayTable += "</div>"
+                    displayTable += "<div id=\"up_update" + row_number + "\"  onclick=\"DeleteRecord(" + row_number + ")\"  class=\"text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 max-w-[120px] py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800\">";
+                    displayTable += "Delete"
+                    displayTable += "</div>"
+                    row_number++;
+                });
+
+                displayTable += '</div>';
+                document.getElementById("rowdata").innerHTML = displayTable;
+
+            }).SearchRecords(email_id_search);
+
+        }
+
+    </script>
+    <div class="block p-6 rounded-lg shadow-lg bg-white mx-8 my-8">
+        <form id="signupForm">
+            <div class="grid grid-cols-3 gap-4">
+                <div class="relative z-0 w-full mb-6 group">
+                    <input type="text" name="name" id="name"
+                        class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                        placeholder=" " required />
+                    <label
+                        class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                        Name
+                    </label>
+                </div>
+                <div class="relative z-0 w-full mb-6 group">
+                    <input type="text" name="mobile_no" id="mobile_no"
+                        class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                        placeholder=" " required />
+                    <label
+                        class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                        Mobile
+                    </label>
+                </div>
+                <div class="relative z-0 w-full mb-6 group">
+                    <input type="text" name="email_id" id="email_id"
+                        class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                        placeholder=" " required />
+                    <label
+                        class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
+                        Email
+                    </label>
+                </div>
+            </div>
+            <div class="grid grid-cols-8 gap-4">
+                <button type="submit"
+                    class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                    onclick="AddRow()" id="add_button">Save</button>
+                <button type="button"
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    onclick="UpdateRecord()" id="update_button">Update</button>
+                <button type="reset"
+                    class="text-white bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-orange-600 dark:hover:bg-orange-700 dark:focus:ring-orange-800">Clear</button>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="block p-6 rounded-lg shadow-lg bg-white mx-8 my-8">
+        <div class="grid grid-cols-2 gap-4">
+            <div class="relative z-0 w-full mb-6 group">
+                <input type="email" id="email_id_search"
+                    class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                    placeholder=" " required />
+                <label for="floating_email"
+                    class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Email
+                    ID</label>
+
+            </div>
+            <span class="">
+                <button type="button"
+                    class="text-white bg-blue-700 hover:bg-blue-800 max-w-[450px] focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    onclick="SearchRecords()">Search</button>
+            </span>
+        </div>
+        <div id="rowdata"></div>
+    </div>
+
+</body>
+
+</html>
